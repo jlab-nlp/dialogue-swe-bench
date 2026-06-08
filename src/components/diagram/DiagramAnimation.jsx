@@ -17,10 +17,10 @@ export default function DiagramAnimation() {
   return (
     <svg
       ref={svgRef}
-      viewBox="0 0 400 400"
-      width="400"
-      height="400"
-      style={{ width: "100%", maxWidth: 500 }}
+      viewBox="0 0 480 420"
+      width="480"
+      height="420"
+      style={{ width: "100%", maxWidth: 700 }}
     />
   );
 }
