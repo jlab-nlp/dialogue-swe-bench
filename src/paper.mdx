@@ -1,40 +1,36 @@
 ---
-title: Academic Project Page Template
+title: "Dialogue SWE-Bench: A Benchmark for Dialogue-Driven Coding Agents"
 authors:
-  - name: Roman Hauksson
-    url: https://roman.technology
-    institution: University of Texas at Dallas
-    notes: ["*", †]
-  - name: Author Two
-    institution: Institution Two
-    notes: ["*", †]
-  - name: Author Three
-    institution: Institution Three
-    notes: ["*"]
-  - name: Author Four
-    institution: Institution Four
-conference: Conference Name
-notes:
-  - symbol: "*"
-    text: author note one
-  - symbol: †
-    text: author note two
+  - name: Brendan King
+    url: https://kingb12.github.io
+    institution: University of California, Santa Cruz
+    # notes: [†]
+  - name: Jeffrey Flanigan
+    url: https://jflanigan.github.io
+    institution: University of California, Santa Cruz
+    # notes: [†]
+# conference: Conference Name
+# notes:
+#   - symbol: "*"
+#     text: author note one
+#   - symbol: †
+#     text: author note two
 links:
   - name: Paper
     url: https://github.com/RomanHauksson/academic-project-astro-template
-    icon: ri:file-pdf-2-line
+    icon: academicons:arxiv
   - name: Code
     url: https://github.com/RomanHauksson/academic-project-astro-template
     icon: ri:github-line
-  - name: arXiv
-    url: https://github.com/RomanHauksson/academic-project-astro-template
-    icon: academicons:arxiv
-  - name: Slides
-    url: https://github.com/RomanHauksson/academic-project-astro-template
-    icon: ri:slideshow-2-line
+  # - name: arXiv
+  #   url: https://github.com/RomanHauksson/academic-project-astro-template
+  #   icon: academicons:arxiv
+  # - name: Slides
+  #   url: https://github.com/RomanHauksson/academic-project-astro-template
+  #   icon: ri:slideshow-2-line
 
 # The color theme of the page. Defaults to "device" (the preference set in the user's brower or operating system). Setting this to "light" or "dark" will override the user's preference. This is useful if your figures only look good in one theme.
-theme: device
+theme: light
 
 # This is the icon that appears in the user's browser tab. To customize, change the favicon.svg file in /public/, or add your own file to /public/ and change the filename here.
 favicon: favicon.svg
@@ -44,42 +40,46 @@ description: Simple project page template for your research paper, built with As
 thumbnail: screenshot-light.png
 ---
 
-import Video from "./components/Video.astro";
 import HighlightedSection from "./components/HighlightedSection.astro";
 import SmallCaps from "./components/SmallCaps.astro";
 import Figure from "./components/Figure.astro";
 import Picture from "./components/Picture.astro";
 import ModelViewer from "./components/ModelViewer.astro"
 import TwoColumns from "./components/TwoColumns.astro";
-import YouTubeVideo from "./components/YouTubeVideo.astro";
 import Carousel from "./components/Carousel.astro";
 import CarouselSlide from "./components/CarouselSlide.astro";
 import Wide from "./components/Wide.astro";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/starwind/tabs";
 import { Comparison } from "./components/Comparison.tsx";
+import { AssistantMessageTimeline } from "./components/AssistantMessageTimeline";
+import DiagramAnimation from "./components/diagram/DiagramAnimation";
+
 
 import outside from "./assets/outside.mp4";
 import dogsDiffc from "./assets/dogs-diffc.png"
 import dogsTrue from "./assets/dogs-true.png"
 import dogsMsillm from "@/assets/dogs-msillm.jpg"
 
-<Video src={outside} />
-
 <HighlightedSection>
 
 ## Abstract
 
-This is a template you can use to create a professional project page for your research paper. [See the code for the template and instructions on how to use it yourself on GitHub](https://github.com/RomanHauksson/academic-project-astro-template). It's made with the [Astro web framework](https://astro.build/) and styled with [Tailwind](https://tailwindcss.com/). You write the content in [MDX](https://mdxjs.com/), which enables markdown formatting like **bold**, _italics_, and ~strikethrough~, as well as custom components like <SmallCaps>small caps.</SmallCaps>
-
+AI coding agents have rapidly transformed software engineering, powering widely used interactive coding assistants.
+Despite their interactive real-world use, existing benchmarks evaluate them as fully-autonomous systems.
+In this work, we introduce **Dialogue SWE-Bench**, an automatic benchmark dataset for evaluating the ability of coding agents to resolve real-world software engineering problems through dialogue with a user.
+We design a novel, persona-grounded user simulator to support our task evaluation, and augment our task evaluation with automatic evaluations of dialogue quality.
+We also propose a new *schema-guided* agent, aimed at improving the dialogue capabilities of off-the-shelf coding agents, which improves over strong baselines by 3-14%.
+Our results indicate that better coding models do not always correspond to better dialogue models, suggesting that dialogue capability is a distinct and currently understudied dimension of coding agent performance.
 </HighlightedSection>
 
 ## Visuals
 
-### Picture
-
-Use the `Picture` component to display images. If you have a figure in PDF format, you can pass in its path as the `src` prop and it will be converted into a web-friendly image automatically.
-
-<Picture src={dogsDiffc} alt="Photo of two running dogs, lossily compressed using the DiffC algorithm" />
+### Demo
+<DiagramAnimation client:load />
+<Figure>
+  <DiagramAnimation slot="figure" />
+  <Fragment slot="caption">hello dsafasdfasdfworld</Fragment>
+</Figure>
 
 ### Wide visual
 
@@ -156,14 +156,6 @@ A carousel is another useful pattern for a collection of visuals that don't nece
   </CarouselSlide>
 </Carousel>
 
-## Two columns
-
-Use the two columns component to display two columns of content. In this example, the first column contains a YouTube video embed and the second column contains an interactive 3D model viewer. By default, they display side by side, but if the screen is narrow enough (for example, on mobile), they're arranged vertically.
-
-<TwoColumns>
-  <YouTubeVideo slot="left" videoId="wjZofJX0v4M" />
-  <ModelViewer slot="right" src="/BoxVertexColors.glb" alt="A cube colored with a rainbow gradient" />
-</TwoColumns>
 
 ## $\LaTeX$
 
