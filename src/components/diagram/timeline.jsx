@@ -120,7 +120,7 @@ export function buildTimeline(svgEl) {
   });
 
   const searchIcon = renderText(svgEl, "🔍", {
-    x: DIV_X + 72,
+    x: DIV_X + 70,
     y: 113 + 183 / 2 + 8,
     "font-size": 32,
     "font-weight": 700,
@@ -129,7 +129,7 @@ export function buildTimeline(svgEl) {
     "text-anchor": "middle",
   });
   const editIcon = renderText(svgEl, "✏️", {
-    x: DIV_X + 102,
+    x: DIV_X + 100,
     y: 113 + 183 / 2 + 8,
     "font-size": 32,
     "font-weight": 700,
@@ -156,7 +156,7 @@ export function buildTimeline(svgEl) {
   );
   console.log("buildTimeline: summaryAssistantEl", { summaryAssistantEl });
 
-  const tl = gsap.timeline({ repeat: -1, repeatDelay: 3 });
+  const tl = gsap.timeline({ repeat: -1, repeatDelay: 5 });
 
   tl
     .to(patchIcon, { opacity: 0, duration: 0, ease: "power1.out" }, "<")
@@ -171,13 +171,9 @@ export function buildTimeline(svgEl) {
     //.to(searchIcon, { opacity: 0, duration: 0, ease: "power1.out" }, '<')
     .to(agentActionIcon, { scale: 1.05, duration: STEP_DURATION / 2, ease: "power2.inOut", yoyo: true, repeat: 1 }, '<')
     .to(observationIcon, { scale: 1.05, duration: STEP_DURATION / 2, ease: "power2.inOut", yoyo: true, repeat: 1 }, `+=${STEP_DURATION * 0.4}`)
-    .to(patchActionIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" })
+    .to(patchActionIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" }, `+=${STEP_DURATION * 0.4}`)
     .to(patchIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" }, "<")
-    .to(summaryAssistantEl, { opacity: 1, y: 0, duration: STEP_DURATION, ease: "power2.out" })
-    .to(searchIcon, { opacity: 0, duration: 1, ease: "power1.out" }, `+=${STEP_DURATION * 0.4}`)
-
-
-
+    .to(summaryAssistantEl, { opacity: 1, y: 0, duration: STEP_DURATION, ease: "power2.out" }, `+=${STEP_DURATION * 0.4}`);
 
   return tl;
 }
