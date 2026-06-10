@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="105px" height="72px" viewBox="0 0 105 72" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group</title>
+    <g id="Claude-Zone" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(0, 0.0304)">
+            <rect id="Rectangle" stroke="#979797" fill="#FFFDFD" x="0.5" y="0.5" width="104" height="70" rx="8"></rect>
+            <text id="📁-src/-📄-main.py-📄RE" font-family="AppleColorEmoji, Apple Color Emoji" font-size="14" font-weight="normal" fill="#0A0A0A">
+                <tspan x="9" y="23">📁</tspan>
+                <tspan x="28" y="23" font-family="AnonymicePowerline, Anonymous Pro for Powerline"> src/  </tspan>
+                <tspan x="9" y="40">📄</tspan>
+                <tspan x="28" y="40" font-family="AnonymicePowerline, Anonymous Pro for Powerline"> main.py  </tspan>
+                <tspan x="9" y="57">📄</tspan>
+                <tspan x="28" y="57" font-family="AnonymicePowerline, Anonymous Pro for Powerline">README.md</tspan>
+            </text>
+        </g>
+    </g>
+</svg>
