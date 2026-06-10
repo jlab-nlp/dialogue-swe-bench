@@ -1,25 +1,16 @@
 import { gsap } from "gsap";
 import { AssistantBubble } from "./AssistantBubble.jsx"
 import { UserBubble } from "./UserBubble.jsx"
-
-const USER_ICON_URL = new URL("../../assets/diagram/user.svg", import.meta.url).href;
-const AGENT_ICON_URL = new URL("../../assets/diagram/agent.svg", import.meta.url).href;
-const REPO_ICON_URL = new URL("../../assets/diagram/repo.svg", import.meta.url).href;
-const SVG_NS = "http://www.w3.org/2000/svg";
-
-const mk = (tag, attrs = {}) => {
-  const el = document.createElementNS(SVG_NS, tag);
-  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
-  return el;
-};
-
-const mkImage = (attrs = {}) => {
-  const { href, ...rest } = attrs;
-  const el = mk("image", rest);
-  el.setAttribute("href", href);
-  el.setAttributeNS("http://www.w3.org/1999/xlink", "href", href);
-  return el;
-};
+import {
+  renderAgentActionIcon,
+  renderAgentIcon,
+  renderDivider,
+  renderRepoIcon,
+  renderObservationIcon,
+  renderPatchIcon,
+  renderText,
+  renderUserIcon,
+} from "./icons.jsx";
 
 /**
  * Builds and plays a timeline that fades in a single assistant message.
@@ -30,26 +21,21 @@ const mkImage = (attrs = {}) => {
 
 const DIV_X = 360;
 const HEADER_Y = 18;
-const STEP_DURATION = 0.6;
+const STEP_DURATION = 0.67;
 export function buildTimeline(svgEl) {
   console.log("buildTimeline: called", { svgEl });
-  let arrowPath = null;
 
-  // --- Add persistent background elements: headers and divider ---
+  // Static setup: these items are always present.
   try {
-    // Left header: Dialogue Environment
-    const leftHeader = mk("text", {
+    renderText(svgEl, "Dialogue Environment", {
       x: 96,
       y: HEADER_Y,
       "font-size": 14,
       "font-weight": 700,
       fill: "#444",
     });
-    leftHeader.textContent = "Dialogue Environment";
-    svgEl.appendChild(leftHeader);
 
-    // Vertical dividing line in the middle
-    const divider = mk("line", {
+    renderDivider(svgEl, {
       x1: DIV_X,
       y1: 0,
       x2: DIV_X,
@@ -59,46 +45,38 @@ export function buildTimeline(svgEl) {
       "stroke-dasharray": "6 6",
       opacity: 0.95,
     });
-    svgEl.appendChild(divider);
 
-    // Right header: Repo Environment
-    const rightHeader = mk("text", {
+    renderText(svgEl, "Repo Environment", {
       x: DIV_X + 80,
       y: HEADER_Y,
       "font-size": 14,
       "font-weight": 700,
       fill: "#444",
     });
-    rightHeader.textContent = "Repo Environment";
-    svgEl.appendChild(rightHeader);
 
-    const agentIcon = mkImage({
-      href: AGENT_ICON_URL,
+    renderAgentIcon(svgEl, {
       x: DIV_X - 50,
       y: 100,
       width: 100,
       height: 183,
     });
-    svgEl.appendChild(agentIcon);
   } catch (err) {
     console.warn("buildTimeline: failed to add static background elements", err);
   }
 
-  // First message: User (on top)
+  // Dynamic setup: message bubbles animate in, but their layout is still computed up front.
   const { el: user1El, height: user1H } = UserBubble(svgEl, "Can you help me with a Permutation error?", { x: 80, y: HEADER_Y + 20 });
   console.log("buildTimeline: user1El", { user1El, user1H });
 
-  const userIcon = mkImage({
-    href: USER_ICON_URL,
+  const userIcon = renderUserIcon(svgEl, {
     x: 0,
-    y: HEADER_Y + 32,
+    y: HEADER_Y + 24,
     width: 64,
     height: 64,
   });
   svgEl.insertBefore(userIcon, user1El);
 
-  const repoIcon = mkImage({
-    href: REPO_ICON_URL,
+  const repoIcon = renderRepoIcon(svgEl, {
     x: 480,
     y: 100 + 36,
     width: 128,
@@ -106,57 +84,100 @@ export function buildTimeline(svgEl) {
   });
   svgEl.insertBefore(repoIcon, user1El);
 
-  const defs = mk("defs");
-  const marker = mk("marker", {
-    id: "repo-arrow-head",
-    viewBox: "0 0 10 10",
-    refX: 8,
-    refY: 5,
-    markerWidth: 8,
-    markerHeight: 8,
-    orient: "auto-start-reverse",
+  const patchIcon = renderPatchIcon(svgEl, {
+    x: 505,
+    y: 140 + 36 + 128 + 12,
+    width: 74,
+    height: 77,
   });
-  marker.appendChild(
-    mk("path", {
-      d: "M 0 0 L 10 5 L 0 10 z",
-      fill: "#16a34a",
-    })
-  );
-  defs.appendChild(marker);
-  svgEl.insertBefore(defs, svgEl.firstChild);
+  svgEl.insertBefore(patchIcon, user1El);
+  gsap.set(patchIcon, { opacity: 0 });
 
-  const agentRightX = DIV_X + 50;
-  const agentCenterY = 100 + 183 / 2;
-  const repoLeftX = 480;
-  const repoCenterY = 100 + 36 + 128 / 2;
-  arrowPath = mk("path", {
-    d: `M ${agentRightX} ${agentCenterY} C ${agentRightX + 36} ${agentCenterY - 44}, ${repoLeftX - 52} ${repoCenterY - 44}, ${repoLeftX} ${repoCenterY}`,
-    fill: "none",
-    stroke: "#16a34a",
-    "stroke-width": 4,
-    "stroke-linecap": "round",
-    "stroke-linejoin": "round",
-    "marker-end": "url(#repo-arrow-head)",
+  const agentActionIcon = renderAgentActionIcon(svgEl, {
+    startX: DIV_X + 50,
+    startY: 80 + 183 / 2,
+    endX: 475,
+    endY: 83 + 183 / 2,
     opacity: 0,
   });
-  svgEl.insertBefore(arrowPath, user1El);
 
-  // Second message: Assistant (below user)
+  const observationIcon = renderObservationIcon(svgEl, {
+    startX: 475,
+    startY: 133 + 183 / 2,
+    endX: DIV_X + 50,
+    endY: 136 + 183 / 2,
+    opacity: 0,
+  });
+
+  const patchActionIcon = renderAgentActionIcon(svgEl, {
+    startX: 541,
+    startY: 256,
+    endX: 541,
+    endY: 302,
+    curveXOffset: 0,
+    curveYOffset: 8,
+    opacity: 0,
+  });
+
+  const searchIcon = renderText(svgEl, "🔍", {
+    x: DIV_X + 72,
+    y: 113 + 183 / 2 + 8,
+    "font-size": 32,
+    "font-weight": 700,
+    fill: "#111",
+    opacity: 0,
+    "text-anchor": "middle",
+  });
+  const editIcon = renderText(svgEl, "✏️", {
+    x: DIV_X + 102,
+    y: 113 + 183 / 2 + 8,
+    "font-size": 32,
+    "font-weight": 700,
+    fill: "#111",
+    opacity: 0,
+    "text-anchor": "middle",
+  });
+
+  // Dynamic setup continues: compute the stack positions for the bubbles.
   const assistantY = HEADER_Y + 20 + user1H + 12;
   const { el: assistantEl, height: assistantH } = AssistantBubble(svgEl, "Sure, how do I reproduce it?", { x: 80, y: assistantY });
   console.log("buildTimeline: assistantEl", { assistantEl, assistantH });
 
   // Third message: User (below assistant)
   const user2Y = assistantY + assistantH + 12;
-  const { el: user2El } = UserBubble(svgEl, "Permutation([[0,1],[0,1]]) gives me a ValueError", { x: 80, y: user2Y });
-  console.log("buildTimeline: user2El", { user2El });
+  const { el: user2El, height: user2H } = UserBubble(svgEl, "Permutation([[0,1],[0,1]]) gives me a ValueError", { x: 80, y: user2Y });
+  console.log("buildTimeline: user2El", { user2El, user2H });
 
-  const tl = gsap.timeline();
+  const summaryAssistantY = user2Y + user2H + 12;
+  const { el: summaryAssistantEl } = AssistantBubble(
+    svgEl,
+    "I was able to reproduce and fix the issue. Here is a summary...",
+    { x: 80, y: summaryAssistantY }
+  );
+  console.log("buildTimeline: summaryAssistantEl", { summaryAssistantEl });
 
-  tl.to(user1El, { opacity: 1, y: 0, duration: STEP_DURATION, ease: "power2.out" })
+  const tl = gsap.timeline({ repeat: -1, repeatDelay: 3 });
+
+  tl
+    .to(patchIcon, { opacity: 0, duration: 0, ease: "power1.out" }, "<")
+    .to(user1El, { opacity: 1, y: 0, duration: STEP_DURATION, ease: "power2.out" })
     .to(assistantEl, { opacity: 1, y: 0, duration: STEP_DURATION, ease: "power2.out" }, `+=${STEP_DURATION * 0.4}`)
-    .to(user2El, { opacity: 1, y: 0, duration: STEP_DURATION, ease: "power2.out" }, `+=${STEP_DURATION * 0.4}`)
-    .to(arrowPath, { opacity: 1, duration: 0.25, ease: "power1.out" }, `+=0.15`);
+    .to(user2El, { opacity: 1, y: 0, duration: STEP_DURATION, ease: "power2.out" })
+    // first action: search
+    .to(searchIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" })
+    .to(agentActionIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" }, "<")
+    .to(observationIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" }, `+=${STEP_DURATION * 0.4}`)
+    .to(editIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" })
+    //.to(searchIcon, { opacity: 0, duration: 0, ease: "power1.out" }, '<')
+    .to(agentActionIcon, { scale: 1.05, duration: STEP_DURATION / 2, ease: "power2.inOut", yoyo: true, repeat: 1 }, '<')
+    .to(observationIcon, { scale: 1.05, duration: STEP_DURATION / 2, ease: "power2.inOut", yoyo: true, repeat: 1 }, `+=${STEP_DURATION * 0.4}`)
+    .to(patchActionIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" })
+    .to(patchIcon, { opacity: 1, duration: STEP_DURATION, ease: "power1.out" }, "<")
+    .to(summaryAssistantEl, { opacity: 1, y: 0, duration: STEP_DURATION, ease: "power2.out" })
+    .to(searchIcon, { opacity: 0, duration: 1, ease: "power1.out" }, `+=${STEP_DURATION * 0.4}`)
+
+
+
 
   return tl;
 }
