@@ -97,20 +97,27 @@ Our results indicate that better coding models do not always correspond to bette
 </Figure>
 
 
-## Table
-
+## Leaderboard
+<Figure>
+<Fragment slot="figure">
 <ResultsTable client:load
-  csvPath="table_1_data.csv"
+          csvPath="table_1_data.csv"
+  additionalCsvPath="leaderboard.csv"
   columns={[
     { key: "model_name",   label: "Model"          },
     { key: "agent_name",   label: "Agent Scaffold"  },
-    { key: "open_weights", label: "Open Weights?"   },
-    { key: "resolved_pct", label: "% Resolved ↑"   },
+    //{ key: "open_weights", label: "Open Weights?"   },
+    { key: "resolved_pct", label: "% Resolved"   },
+    { key: "avg_cost",     label: "Cost ($)"        },
     { key: "avg_turns",    label: "# Turns"         },
     { key: "avg_steps",    label: "# Steps"         },
-    { key: "avg_cost",     label: "Cost ($)"        },
   ]}
 />
+</Fragment>
+  <Fragment slot="caption">
+    Leaderboard of coding agents on **Dialogue SWE-Bench**. ^ indicate results from the experiments in our [paper](), which considers three agents: Openhands[@wang_openhands_2024], OpenHands Interactive[@vijayvargiya2026ambigswe], and our proposed Schema-Guided agent. To add a result, follow the instructions in [here](TODO).
+  </Fragment>
+</Figure>
 
 ## BibTeX citation
 

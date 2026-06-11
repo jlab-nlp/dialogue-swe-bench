@@ -23,6 +23,7 @@
     "@iconify-json/academicons": "^1.1.14",
     "@iconify-json/ri": "^1.2.3",
     "@tailwindcss/vite": "^4.3.0",
+    "@tanstack/react-table": "^8.21.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "astro": "^6.3.5",

@@ -1,16 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Papa from "papaparse";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  flexRender,
+} from "@tanstack/react-table";
 
 const NUMERIC_KEYS = new Set(["resolved_pct", "avg_turns", "avg_steps", "avg_cost"]);
-
-function SortIcon({ direction }) {
-  if (!direction) return <span style={{ opacity: 0.25, marginLeft: 4 }}>⇅</span>;
-  return (
-    <span style={{ marginLeft: 4 }}>
-      {direction === "asc" ? "↑" : "↓"}
-    </span>
-  );
-}
 
 function formatValue(key, value) {
   if (value === "" || value == null) return "";
@@ -21,102 +18,121 @@ function formatValue(key, value) {
   return value;
 }
 
-export default function ResultsTable({ csvPath, columns }) {
+export default function ResultsTable({ csvPath, additionalCsvPath, columns: columnDefs }) {
   const [rows, setRows] = useState([]);
   const [headers, setHeaders] = useState([]);
-  const [sortCol, setSortCol] = useState(null);
-  const [sortDir, setSortDir] = useState("asc");
+  const [sorting, setSorting] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  console.log("Starting CSV fetch for:", csvPath);
-  if (!csvPath) return;
-  setLoading(true);
-  console.log("Fetching:", csvPath);
-  fetch(csvPath)
-    .then((res) => {
-      console.log("Response status:", res.status, res.ok);
-      if (!res.ok) throw new Error(`Failed to load CSV: ${res.status}`);
-      return res.text();
-    })
-    .then((text) => {
-      console.log("Raw CSV text (first 200 chars):", text.slice(0, 200));
-      const result = Papa.parse(text, {
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: (h) => h.trim(),
-        transform: (val) => val.trim(),
+   useEffect(() => {
+    if (!csvPath) return;
+    setLoading(true);
+
+    const fetchCsv = (path) =>
+      fetch(path)
+        .then((res) => {
+          if (!res.ok) throw new Error(`Failed to load CSV: ${res.status}`);
+          return res.text();
+        })
+        .then((text) =>
+          Papa.parse(text, {
+            header: true,
+            skipEmptyLines: true,
+            transformHeader: (h) => h.trim(),
+            transform: (val) => val.trim(),
+          })
+        );
+
+    const fetches = [fetchCsv(csvPath)];
+    if (additionalCsvPath) fetches.push(fetchCsv(additionalCsvPath));
+
+    Promise.all(fetches)
+      .then(([main, extra]) => {
+        setHeaders(main.meta.fields ?? []);
+        main.data.forEach(row => {
+          row.agent_name = row.agent_name + "^";
+        });
+        const combined = [
+          ...main.data,
+          ...(extra?.data ?? []),
+        ];
+        setRows(combined);
+        console.log(combined);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
       });
-      console.log("Parsed rows:", result.data.length, result.meta.fields);
-      setHeaders(result.meta.fields ?? []);
-      setRows(result.data);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Fetch error:", err);
-      setError(err.message);
-      setLoading(false);
-    });
-}, [csvPath]);
+  }, [csvPath, additionalCsvPath]);
 
-  // Use provided columns, or fall back to all CSV headers
-  const displayCols = columns ?? headers.map((h) => ({ key: h, label: h }));
+  const displayCols = columnDefs ?? headers.map((h) => ({ key: h, label: h }));
 
-  const handleSort = useCallback(
-    (key) => {
-      if (sortCol === key) {
-        setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-      } else {
-        setSortCol(key);
-        setSortDir("asc");
-      }
-    },
-    [sortCol]
+  const columns = useMemo(
+    () =>
+      displayCols.map(({ key, label }) => ({
+        accessorKey: key,
+        header: label,
+        cell: (info) => formatValue(key, info.getValue()),
+        sortingFn: NUMERIC_KEYS.has(key) ? "basic" : "alphanumeric",
+      })),
+    [displayCols.map((c) => c.key).join(",")]
   );
 
-  const sortedRows = [...rows].sort((a, b) => {
-    if (!sortCol) return 0;
-    const av = a[sortCol] ?? "";
-    const bv = b[sortCol] ?? "";
-    const isNum = NUMERIC_KEYS.has(sortCol);
-    const ap = isNum ? parseFloat(av) : av.toLowerCase();
-    const bp = isNum ? parseFloat(bv) : bv.toLowerCase();
-    if (ap < bp) return sortDir === "asc" ? -1 : 1;
-    if (ap > bp) return sortDir === "asc" ? 1 : -1;
-    return 0;
+  const table = useReactTable({
+    data: rows,
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
-    <div style={styles.wrapper}>
-      {loading && <p style={styles.status}>Loading…</p>}
-      {error && <p style={{ ...styles.status, color: "#c0392b" }}>{error}</p>}
+    <div style={s.wrapper}>
+      {loading && <p style={s.status}>Loading…</p>}
+      {error && <p style={{ ...s.status, color: "#b91c1c" }}>{error}</p>}
       {!loading && !error && (
-        <div style={styles.scrollContainer}>
-          <table style={styles.table}>
+        <div style={s.scroll}>
+          <table style={s.table}>
             <thead>
-              <tr>
-                {displayCols.map(({ key, label }) => (
-                  <th
-                    key={key}
-                    onClick={() => handleSort(key)}
-                    style={{
-                      ...styles.th,
-                      ...(sortCol === key ? styles.thActive : {}),
-                    }}
-                  >
-                    {label}
-                    <SortIcon direction={sortCol === key ? sortDir : null} />
-                  </th>
-                ))}
-              </tr>
+              {table.getHeaderGroups().map((hg) => (
+                <tr key={hg.id}>
+                  {hg.headers.map((header) => {
+                    const sorted = header.column.getIsSorted();
+                    return (
+                      <th
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        style={s.th}
+                      >
+                        <span style={s.thInner}>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <span style={s.sortIcon}>
+                            {sorted === "asc" ? " ▲" : sorted === "desc" ? " ▼" : " ⇅"}
+                          </span>
+                        </span>
+                      </th>
+                    );
+                  })}
+                </tr>
+              ))}
             </thead>
             <tbody>
-              {sortedRows.map((row, i) => (
-                <tr key={i} style={i % 2 === 0 ? styles.rowEven : styles.rowOdd}>
-                  {displayCols.map(({ key }) => (
-                    <td key={key} style={styles.td}>
-                      {formatValue(key, row[key])}
+              {table.getRowModel().rows.map((row, i) => (
+                <tr
+                  key={row.id}
+                  style={i % 2 === 0 ? s.rowEven : s.rowOdd}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#f0f4ff")}
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background =
+                      i % 2 === 0 ? s.rowEven.background : s.rowOdd.background)
+                  }
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} style={s.td}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
                 </tr>
@@ -129,52 +145,57 @@ useEffect(() => {
   );
 }
 
-const styles = {
+const s = {
   wrapper: {
     fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
     fontSize: "0.9rem",
     margin: "2rem 0",
   },
   status: {
-    color: "#666",
+    color: "#888",
     fontStyle: "italic",
   },
-  scrollContainer: {
+  scroll: {
     overflowX: "auto",
-    borderRadius: 8,
-    border: "1px solid #e2e8f0",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
   },
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    minWidth: 600,
+    minWidth: 500,
   },
   th: {
-    padding: "10px 14px",
+    padding: "12px 16px",
     textAlign: "left",
-    background: "#f8fafc",
-    borderBottom: "2px solid #e2e8f0",
-    fontWeight: 600,
+    background: "#d1d5db",
+    fontWeight: 700,
+    fontSize: "0.85rem",
     whiteSpace: "nowrap",
     cursor: "pointer",
     userSelect: "none",
-    color: "#374151",
+    color: "#111827",
+    borderBottom: "2px solid #9ca3af",
   },
-  thActive: {
-    background: "#eef2ff",
-    color: "#4338ca",
+  thInner: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 4,
+  },
+  sortIcon: {
+    opacity: 0.6,
+    fontSize: "0.75rem",
   },
   td: {
-    padding: "9px 14px",
-    borderBottom: "1px solid #f1f5f9",
-    color: "#1e293b",
+    padding: "11px 16px",
+    borderBottom: "1px solid #e5e7eb",
+    color: "#1f2937",
     whiteSpace: "nowrap",
   },
   rowEven: {
     background: "#ffffff",
+    transition: "background 0.1s",
   },
   rowOdd: {
-    background: "#f8fafc",
+    background: "#f9fafb",
+    transition: "background 0.1s",
   },
 };
