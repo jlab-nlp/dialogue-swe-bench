@@ -30,6 +30,7 @@
     "astro-icon": "^1.1.0",
     "gsap": "^3.15.0",
     "image-size": "^2.0.2",
+    "papaparse": "^5.5.3",
     "pdf-to-img": "^5.0.0",
     "react": "^19.2.1",
     "react-compare-slider": "^3.1.0",

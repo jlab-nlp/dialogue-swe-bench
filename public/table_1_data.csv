@@ -1,0 +1,13 @@
+_index,run_dir,model_name,agent_name,open_weights,template_key,resolved,total,resolved_pct,avg_turns,avg_steps,avg_cost,total_cost
+0,current-v1.4.1/current_v141_5_mini_user_llama70b_k8s,GPT-5 mini,OpenHands,False,gpt5mini_openhands,171,499,34.2685370741483,2.0601202404809618,48.83567134268537,0.26495770140280556,132.21389299999998
+1,interactive/interactive_swe_5_mini_user_llama70b_k8s,GPT-5 mini,OH Interactive,False,gpt5mini_interactive,271,500,54.2,4.456,41.268,0.23100428869999998,115.50214435
+2,grounded-v2.5/grounded_agent_v25_5_mini_user_llama70b_k8s,GPT-5 mini,Schema-Guided (Ours),False,gpt5mini_ours,294,500,58.8,8.378,39.438,0.23658027399999998,118.29013699999999
+3,current-v1.4.1/current_v141_5_user_llama70b_k8s_w_finish,GPT-5,OpenHands,False,gpt5_openhands,236,497,47.48490945674044,12.233400402414487,52.927565392354126,1.1341037238430585,563.64955075
+4,interactive/interactive_swe_5_user_llama70b_k8s,GPT-5,OH Interactive,False,gpt5_interactive,273,500,54.6,17.062,41.022,0.9670650220000001,483.53251100000006
+5,grounded-v2.5/grounded_agent_v25_1_5_user_llama70b_k8s,GPT-5,Schema-Guided (Ours),False,gpt5_ours,290,500,58.0,11.948,38.424,0.8612064305000001,430.60321525000006
+6,current-v1.4.1/current_v141_devstral2small_user_llama70b_k8s,Devstral 2 Small (24B),OpenHands,True,devstral_openhands,134,500,26.8,1.836,81.272,0.35326074100000004,176.63037050000003
+7,interactive/interactive_swe_devstral2small_user_llama70b_k8s,Devstral 2 Small (24B),OH Interactive,True,devstral_interactive,210,498,42.16867469879518,3.5240963855421685,71.73092369477912,0.29788206626506025,148.345269
+8,grounded-v2.5/grounded_agent_v25_devstral2small_user_llama70b_w_msg_128_k8s,Devstral 2 Small (24B),Schema-Guided (Ours),True,devstral_ours,191,495,38.58585858585859,3.2767676767676766,75.10909090909091,0.29577951676767683,146.41086080000002
+9,current-v1.4.1/current_v141_qwen3coder_user_llama70b_k8s,Qwen3-Coder 30B-A3B,OpenHands,True,qwen_openhands,116,499,23.246492985971944,3.5571142284569137,60.791583166332664,0.1783495791262525,88.99643998399999
+10,interactive/interactive_swe_qwen3coder_user_llama70b_k8s,Qwen3-Coder 30B-A3B,OH Interactive,True,qwen_interactive,127,500,25.4,2.634,46.308,0.1159772477,57.988623849999996
+11,grounded-v2.5/grounded_agent_v25_qwen3coder_user_llama70b_k8s,Qwen3-Coder 30B-A3B,Schema-Guided (Ours),True,qwen_ours,161,499,32.26452905811623,3.9599198396793587,50.97194388777555,0.13397496833667333,66.85350919999999

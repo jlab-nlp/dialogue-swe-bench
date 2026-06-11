@@ -56,22 +56,23 @@ import DiagramAnimation from "./components/diagram/DiagramAnimation";
 
 
 import outside from "./assets/outside.mp4";
-import dogsDiffc from "./assets/dogs-diffc.png"
+import parallelAxesPlot from "./assets/parallel_axes_plot.png"
 import dogsTrue from "./assets/dogs-true.png"
 import dogsMsillm from "@/assets/dogs-msillm.jpg"
-
+import ResultsTable from "./components/ResultTable.jsx";
 
 <DiagramAnimation client:load />
 
 <Figure>
   <Fragment slot="caption">
+
 The **Dialogue SWE-Bench** setting for evaluating coding agents through dialogue. 
-The user never interacts with code directly and performs real-world software engineering tasks *through dialogue.* 
+The user never interacts with code directly and performs real-world software engineering tasks through dialogue. 
 Coding agents operate in both the dialogue and repository environments to achieve repository-level software engineering tasks.
 We evaluate both patch correctness (Task Resolution) and dialogue quality.
 </Fragment>
 </Figure>
-<HighlightedSection>
+
 
 ## Abstract
 
@@ -81,18 +82,35 @@ In this work, we introduce **Dialogue SWE-Bench**, an automatic benchmark datase
 We design a novel, persona-grounded user simulator to support our task evaluation, and augment our task evaluation with automatic evaluations of dialogue quality.
 We also propose a new *schema-guided* agent, aimed at improving the dialogue capabilities of off-the-shelf coding agents, which improves over strong baselines by 3-14%.
 Our results indicate that better coding models do not always correspond to better dialogue models, suggesting that dialogue capability is a distinct and currently understudied dimension of coding agent performance.
-</HighlightedSection>
 
 
-{/* ## Citation
+## Coding Capabilitity $\neq$ Dialogue Capability
 
-If you copy your bibliography into `./bibliography.bib`, you can cite papers using their BibTeX keys, and they'll be automatically formatted and included in the bibliography section at the end. For example: [@vaswani2017attention]. Note that these citations are distinct from footnotes[^mynote], which show up in a separate section if you use them.
+<Figure>
+  <Picture slot="figure" src={parallelAxesPlot} alt="A parallel axes plot showing the performance of different coding agents across multiple evaluation metrics." />
+  <Fragment slot="caption">
+    Performance on SWE-Bench Verified [@chowdhury_introducing_2024] vs. Dialogue SWE-Bench task resolution and our evaluation of Dialogue Quality.
+    For SWE-Bench Verified, we used reported performance of coding agents using OpenHands [@wang_openhands_2024], with the exception of Devstral 2, which reports a score with a custom agent [@rastogi2025devstralfinetuninglanguagemodels].
+    We find that **Dialogue SWE-Bench** is more challenging for coding models than SWE-Bench Verified [@chowdhury_introducing_2024], and that stronger coding performance on SWE-Bench Verified does not necessarily translate to better dialogue performance on Dialogue SWE-Bench. 
+    In addition, Dialogue Quality, measured using the sum of ratings for dialogue Naturalness and Coherence [@kazi_large_2024], is not perfectly correlated with task resolution performance, suggesting that task resolution alone is not sufficient for evaluating the usability of a coding agent.
+  </Fragment>
+</Figure>
 
-[^mynote]: On the web, they should really be called "endnotes", since each page constitutes a full document.
 
 ## Table
 
-Add simple tables using [GitHub Flavored Markdown syntax](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables):
+<ResultsTable client:load
+  csvPath="table_1_data.csv"
+  columns={[
+    { key: "model_name",   label: "Model"          },
+    { key: "agent_name",   label: "Agent Scaffold"  },
+    { key: "open_weights", label: "Open Weights?"   },
+    { key: "resolved_pct", label: "% Resolved ↑"   },
+    { key: "avg_turns",    label: "# Turns"         },
+    { key: "avg_steps",    label: "# Steps"         },
+    { key: "avg_cost",     label: "Cost ($)"        },
+  ]}
+/>
 
 ## BibTeX citation
 
@@ -102,4 +120,4 @@ Add simple tables using [GitHub Flavored Markdown syntax](https://docs.github.co
 
 ## Bibliography
 
-[^ref] */}
+[^ref]
